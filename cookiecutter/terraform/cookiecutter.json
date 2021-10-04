@@ -1,0 +1,21 @@
+{
+  "region": "us-east-1",
+  "namespace": "eg",
+  "environment": "ue2",
+  "stage": "test",
+  "name": "example",
+  "tenant": "tenant",
+  "project_name": "My Terraform Module",
+  "delimiter": "-",
+  "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '_').replace('-', '_') }}",
+  "project_short_description": "Describe your recipe",
+  "terraform": {
+    "variables": [
+      {
+        "name": "hello",
+        "type": "string",
+        "description": ""
+      }
+    ]
+  }
+}
