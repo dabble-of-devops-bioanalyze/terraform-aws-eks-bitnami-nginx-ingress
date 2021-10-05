@@ -1,14 +1,24 @@
-output "id" {
-  description = "ID of the created example"
-  value       = module.this.enabled ? module.this.id : null
+output "cluster_issuer_yaml_file" {
+  description = "Location of the cluster-issuer.yaml file"
+  value       = abspath("${var.helm_values_dir}/cluster-issuer.yaml")
 }
 
-output "example" {
-  description = "Example output"
-  value       = module.this.enabled ? local.example : null
+output "kubernetes_service_ingress" {
+  description = "Kubernetes Services Ingress"
+  value       = data.kubernetes_service.ingress
 }
 
-output "random" {
-  description = "Stable random number for this example"
-  value       = module.this.enabled ? join("", random_integer.example[*].result) : null
+output "aws_elb_ingress" {
+  description = "AWS ELB of the ingress"
+  value       = data.aws_elb.ingress
+}
+
+output "helm_release" {
+  description = "helm release"
+  value       = helm_release.ingress
+}
+
+output "helm_release_name" {
+  description = "Release name given to the ingress release"
+  value       = helm_release.ingress.name
 }

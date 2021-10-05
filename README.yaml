@@ -5,7 +5,7 @@
 #
 
 # Name of this project
-name: terraform-aws-eks-jupyterhub
+name: terraform-aws-eks-bitnami-ssl
 
 # Logo for this project
 #logo: docs/logo.png
@@ -20,7 +20,7 @@ copyrights:
     year: "2020"
 
 # Canonical GitHub repo
-github_repo: dabble-of-devops-biodeploy/terraform-aws-eks-jupyterhub
+github_repo: dabble-of-devops-bioanalyze/terraform-aws-eks-bitnami-ssl
 
 # Badges to display
 badges:
@@ -35,7 +35,7 @@ badges:
 related:
   - name: terraform-aws-eks-autoscaling
     description: Terraform module to provision an Autoscaling EKS Cluster. Acts as a wrapper around cloudposse/terraform-aws-eks-cluster and cloudposse/terraform-aws-eks-node-groups
-    url: https://github.com/dabble-of-devops-biodeploy/terraform-aws-eks-autoscaling
+    url: https://github.com/dabble-of-devops-bioanalyze/terraform-aws-eks-autoscaling
   - name: terraform-aws-eks-cluster
     description: Terraform module to deploy an AWS EKS Cluster.
     url: https://github.com/cloudposse/terraform-aws-eks-workers
@@ -81,6 +81,15 @@ description: |
 
 # List any resources helpful for someone to get started. For example, link to the hashicorp documentation or AWS documentation.
 references:
+  - name: "Bitnami Tutorial: Secure Kubernetes Services with Ingress, TLS and Let's Encrypt"
+    description: "Set up the NGINX Ingress Controller in our cluster and create Ingress routes for an example application. You'll learn how Ingress objects are defined, including how to configure TLS and basic authentication."
+    url: "https://docs.bitnami.com/tutorials/secure-kubernetes-services-with-ingress-tls-letsencrypt"
+  - name: "Cert Manager Release Version Info"
+    description : ""
+    url: "https://cert-manager.io/docs/installation/supported-releases/"
+  - name: "Cert Manager Installation with Helm"
+    description: ""
+    url: "https://cert-manager.io/docs/installation/helm/"
   - name: "Terraform Standard Module Structure"
     description: "HashiCorp's standard module structure is a file and directory layout we recommend for reusable modules distributed in separate repositories."
     url: "https://www.terraform.io/docs/modules/index.html#standard-module-structure"
@@ -96,8 +105,12 @@ references:
 
 
 # Introduction to the project
-#introduction: |-
-#  This is an introduction.
+introduction: |-
+  This module installs a NGINX Ingress on an existing EKS cluster, and sets up the ClusterIssuer for Let'sEncrypt.
+
+  Most often you will call this module if you want to add SSL to a web application deployed on Kubernetes.
+
+  This module has only been tested on AWS EKS.
 
 # How to use this module. Should be an easy example to copy and paste.
 usage: |-
@@ -107,24 +120,27 @@ usage: |-
   (which tests and deploys the example on AWS), see [test](test).
 
   ```hcl
-  module "eks" {
-    source = "dabble-of-devops-biodeploy/eks-jupyterhub/aws"
-
-    region = var.region
-    vpc_id = var.vpc_id
-    subnet_ids = var.subnet_ids
-
-    oidc_provider_enabled = true
-    cluster_encryption_config_enabled = true
-
-    context = module.this.context
+  module "web_ssl" {
+    depends_on = [
+      module.eks,
+    ]
+    providers = {
+      aws        = aws
+      kubernetes = kubernetes
+      helm       = helm
+    }
+    source = "dabble-of-devops-bioanalyze/eks-bitnami-ssl/aws"
+    #version = ""
+    letsencrypt_email                     = "hello@gmail.com"
+    helm_values_dir                       = abspath("helm_charts/web_app")
+    helm_release_name = "web_app"
   }
   ```
 
 # Example usage
 examples: |-
   Here is an example of using this module:
-  - [`examples/complete`](https://github.com/dabble-of-devops-biodeploy/terraform-aws-eks-jupyterhub/) - complete example of using this module
+  - [`examples/complete`](https://github.com/dabble-of-devops-bioanalyze/terraform-aws-eks-bitnami-ssl/) - complete example of using this module
 
 # How to get started quickly
 #quickstart: |-
