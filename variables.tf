@@ -7,11 +7,13 @@ variable "helm_release_name" {
 variable "helm_release_repository" {
   type        = string
   description = "helm release chart repository"
+  default     = "https://charts.bitnami.com/bitnami"
 }
 
 variable "helm_release_chart" {
   type        = string
   description = "helm release chart"
+  default     = "nginx-ingress-controller"
 }
 
 variable "helm_release_namespace" {
@@ -23,6 +25,7 @@ variable "helm_release_namespace" {
 variable "helm_release_version" {
   type        = string
   description = "helm release version"
+  default     = "7.6.21"
 }
 
 variable "helm_release_wait" {

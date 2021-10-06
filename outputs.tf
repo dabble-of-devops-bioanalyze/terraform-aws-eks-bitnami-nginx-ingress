@@ -1,6 +1,6 @@
 output "cluster_issuer_yaml_file" {
   description = "Location of the cluster-issuer.yaml file"
-  value       = abspath("${var.helm_values_dir}/cluster-issuer.yaml")
+  value       = abspath("${var.helm_release_values_dir}/cluster-issuer.yaml")
 }
 
 output "kubernetes_service_ingress" {

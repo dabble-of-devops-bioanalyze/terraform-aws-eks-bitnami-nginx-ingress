@@ -1,7 +1,7 @@
 resource "helm_release" "ingress" {
-  name             = "${var.nginx_ingress_controller_release_name}-ingress"
-  repository       = "https://charts.bitnami.com/bitnami"
-  chart            = "nginx-ingress-controller"
+  name             = "${var.helm_release_name}-ingress"
+  repository       = var.helm_release_repository
+  chart            = var.helm_release_chart
   namespace        = var.helm_release_namespace
   create_namespace = var.helm_release_create_namespace
   wait             = var.helm_release_wait
@@ -42,7 +42,7 @@ resource "local_file" "cluster_issuer" {
     data.template_file.cluster_issuer
   ]
   content  = data.template_file.cluster_issuer.rendered
-  filename = "${var.helm_values_dir}/cluster-issuer.yaml"
+  filename = "${var.helm_release_values_dir}/cluster-issuer.yaml"
 }
 
 resource "null_resource" "kubectl_apply_cluster_issuer" {
@@ -51,8 +51,8 @@ resource "null_resource" "kubectl_apply_cluster_issuer" {
   ]
   provisioner "local-exec" {
     command = <<EOT
-     mkdir -p ${var.helm_values_dir}
-     kubectl apply -f ${var.helm_values_dir}/cluster-issuer.yaml
+     mkdir -p ${var.helm_release_values_dir}
+     kubectl apply -f ${var.helm_release_values_dir}/cluster-issuer.yaml
      EOT
   }
 }
