@@ -5,7 +5,7 @@
 #
 
 # Name of this project
-name: terraform-aws-eks-bitnami-ssl
+name: terraform-aws-eks-bitnami-nginx-ingress
 
 # Logo for this project
 #logo: docs/logo.png
@@ -129,7 +129,7 @@ usage: |-
       kubernetes = kubernetes
       helm       = helm
     }
-    source = "dabble-of-devops-bioanalyze/eks-bitnami-ssl/aws"
+    source = "dabble-of-devops-bioanalyze/eks-bitnami-nginx-ingress/aws"
     #version = ""
     letsencrypt_email                     = "hello@gmail.com"
     helm_values_dir                       = abspath("helm_charts/web_app")
@@ -140,7 +140,7 @@ usage: |-
 # Example usage
 examples: |-
   Here is an example of using this module:
-  - [`examples/complete`](https://github.com/dabble-of-devops-bioanalyze/terraform-aws-eks-bitnami-ssl/) - complete example of using this module
+  - [`examples/complete`](https://github.com/dabble-of-devops-bioanalyze/terraform-aws-eks-bitnami-nginx-ingress/) - complete example of using this module
 
 # How to get started quickly
 #quickstart: |-
