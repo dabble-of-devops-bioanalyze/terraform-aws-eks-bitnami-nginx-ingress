@@ -22,3 +22,8 @@ output "helm_release_name" {
   description = "Release name given to the ingress release"
   value       = helm_release.ingress.name
 }
+
+output "clusterissuer_letsencrypt_name" {
+  description = "Name given to to the cluster issuer"
+  value       = "${var.helm_release_name}-letsencrypt"
+}
