@@ -27,9 +27,6 @@ data "aws_elb" "ingress" {
 
 
 data "template_file" "cluster_issuer" {
-  depends_on = [
-    helm_release.ingress,
-  ]
   template = file("${path.module}/cluster-issuer.yaml.tpl")
   vars = {
     name              = var.helm_release_name
@@ -38,6 +35,7 @@ data "template_file" "cluster_issuer" {
 }
 
 resource "local_file" "cluster_issuer" {
+  count = var.render_cluster_issuer == true ? 1 : 0
   depends_on = [
     data.template_file.cluster_issuer
   ]
@@ -46,6 +44,7 @@ resource "local_file" "cluster_issuer" {
 }
 
 resource "null_resource" "kubectl_apply_cluster_issuer" {
+  count = var.render_cluster_issuer == true ? 1 : 0
   depends_on = [
     local_file.cluster_issuer
   ]

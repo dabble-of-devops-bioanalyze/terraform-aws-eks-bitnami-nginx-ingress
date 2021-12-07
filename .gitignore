@@ -18,3 +18,22 @@
 # Crash log files
 crash.log
 test.log
+
+# Dev Credentials
+.aws
+.aws/**
+**/.aws
+.ssh
+.ssh/**
+**/.ssh
+.kube
+**/.kube
+
+## Python things
+.pytest_cache
+**/.pytest_cache
+_build
+
+config.cfg
+
+examples/**/tests/__pycache__

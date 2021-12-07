@@ -80,3 +80,14 @@ variable "aws_route53_record_name" {
   description = "Record name to add to aws_route_53. Must be a valid subdomain - www,app,etc"
   default     = "www"
 }
+
+variable "render_cluster_issuer" {
+  type        = bool
+  description = "Create a cluster-issuer.yaml file"
+  default     = true
+}
+
+variable "install_ingress" {
+  type    = bool
+  default = true
+}

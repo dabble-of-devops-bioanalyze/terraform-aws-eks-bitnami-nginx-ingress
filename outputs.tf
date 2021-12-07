@@ -1,5 +1,5 @@
 output "cluster_issuer_yaml_file" {
-  description = "Location of the cluster-issuer.yaml file"
+  description = "Location of the cluster-issuer.yaml file if created"
   value       = abspath("${var.helm_release_values_dir}/cluster-issuer.yaml")
 }
 
