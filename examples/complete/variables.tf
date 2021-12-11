@@ -1,3 +1,31 @@
+variable "region" {
+  type = string
+  default = "us-east-2"
+}
+
+variable "eks_node_groups" {
+  type = list(object({
+    instance_types = list(string)
+    desired_size   = number
+    min_size       = number
+    max_size       = number
+    disk_size      = number
+    name           = string
+  }))
+  description = "EKS Node Groups"
+  default = [
+    {
+      name           = "node-group-1"
+      instance_types = ["t3a.medium", "t3a.large"]
+      desired_size   = 1
+      min_size       = 0
+      max_size       = 10
+      disk_size      = 20
+    }
+  ]
+}
+
+
 variable "helm_release_name" {
   type        = string
   description = "helm release name"

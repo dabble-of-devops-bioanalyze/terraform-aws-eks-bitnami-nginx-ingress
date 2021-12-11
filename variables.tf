@@ -1,3 +1,8 @@
+##################################################
+# Helm Release Variables - General
+# corresponds to input to resource "helm_release"
+##################################################
+
 variable "helm_release_name" {
   type        = string
   description = "helm release name"
@@ -88,6 +93,49 @@ variable "render_cluster_issuer" {
 }
 
 variable "install_ingress" {
+  description = "Install the ingress. You generally won't do this directly, as it is done when bootstrapping a cluster."
   type    = bool
-  default = true
+  default = false
+}
+
+variable "use_existing_ingress" {
+  type        = bool
+  description = "Use existing ingress"
+  default     = true
+}
+
+variable "render_ingress" {
+  type        = bool
+  default     = true
+  description = "Render ingress.yaml file - only useful if installing an additional service such as nginx"
+}
+
+variable "existing_ingress_name" {
+  type        = string
+  description = "Existing ingress release name"
+  default     = "nginx-ingress-ingress-nginx-ingress-controller"
+}
+
+variable "existing_ingress_namespace" {
+  type        = string
+  description = "Existing ingress release namespace"
+  default     = "default"
+}
+
+##################################################
+# Template file paths
+# Default is "", which will use the local templates
+# Otherwise, supply a template path
+##################################################
+
+variable "ingress_template" {
+  type        = string
+  description = "Path to ingress template. Ingress compatible with bitnami is given."
+  default     = ""
+}
+
+variable "cluster_issuer_template" {
+  type        = string
+  description = "Path to cluster issuer template. Default cluster issuer is supplied."
+  default     = ""
 }

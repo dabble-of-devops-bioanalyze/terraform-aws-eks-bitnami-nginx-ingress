@@ -1,0 +1,16 @@
+apiVersion: cert-manager.io/v1alpha2
+kind: ClusterIssuer
+metadata:
+  name: ingress-letsencrypt
+  labels:
+    name: ingress-letsencrypt
+spec:
+  acme:
+    email: hello@gmail.com
+    privateKeySecretRef:
+      name: ingress-letsencrypt
+    server: https://acme-v02.api.letsencrypt.org/directory
+    solvers:
+    - http01:
+        ingress:
+          class: "nginx"

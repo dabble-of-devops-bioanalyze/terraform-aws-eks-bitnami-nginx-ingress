@@ -2,27 +2,73 @@ provider "aws" {
   region = var.region
 }
 
+provider "http" {
 
-data "aws_availability_zones" "available" {}
+}
+
+provider "tls" {
+}
+
+#############################################################
+# Networking
+#############################################################
+
+data "aws_availability_zones" "available" {
+  # exclude us-east-1e, not allowed
+  # exclude_names = ["us-east-1e"]
+}
 
 data "aws_caller_identity" "current" {}
 
+resource "aws_default_vpc" "default" {
+  tags = {
+    Name = "Default VPC"
+  }
+}
 
-# Create an EKS cluster or use an existing
+output "vpc" {
+  value = aws_default_vpc.default
+}
+
+resource "aws_default_subnet" "default_az" {
+  count             = length(data.aws_availability_zones.available.names)
+  availability_zone = data.aws_availability_zones.available.names[count.index]
+}
+
+output "aws_default_subnet" {
+  value = aws_default_subnet.default_az
+}
+
+locals {
+  # create vpc and subnets
+  vpc_id     = aws_default_vpc.default.id
+  subnet_ids = aws_default_subnet.default_az[*].id
+}
+
+output "subnet_ids" {
+  value = local.subnet_ids
+}
+
+#############################################################
+# Admin EKS Cluster
+#############################################################
+
+# https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html
 module "eks" {
-  source = "dabble-of-devops-bioanalyze/eks-autoscaling/aws"
-  # version = ""
+  source  = "dabble-of-devops-bioanalyze/eks-autoscaling/aws"
+  version = ">= 1.20.0"
 
-  region     = var.region
-  vpc_id     = var.vpc_id
-  subnet_ids = var.subnet_ids
-
-  oidc_provider_enabled             = true
-  cluster_encryption_config_enabled = true
-  eks_node_groups                   = var.eks_node_groups
-
+  region                                        = var.region
+  vpc_id                                        = local.vpc_id
+  subnet_ids                                    = local.subnet_ids
+  kubernetes_version                            = "1.19"
+  oidc_provider_enabled                         = true
+  cluster_encryption_config_enabled             = true
+  eks_node_groups                               = var.eks_node_groups
   eks_node_group_autoscaling_enabled            = true
   eks_worker_group_autoscaling_policies_enabled = true
+  install_ingress                               = true
+  letsencrypt_email                             = "jillian@dabbleofdevops.com"
 
   context = module.this.context
 }
@@ -75,29 +121,38 @@ resource "null_resource" "kubectl_update" {
     }
   }
 }
-module "nginx_ingress" {
-  count                   = var.enable_ssl == true ? 1 : 0
-  source                  = "dabble-of-devops-bioanalyze/eks-bitnami-nginx-ingress/aws"
-  version                 = "0.0.2"
-  letsencrypt_email       = var.letsencrypt_email
-  helm_release_values_dir = var.helm_release_values_dir
-  helm_release_name       = var.helm_release_name
-}
 
-data "kubernetes_service" "airflow_ingress" {
+# Check to make sure that the ingress is installed
+data "kubernetes_service" "ingress" {
   count = var.enable_ssl == true ? 1 : 0
   depends_on = [
-    module.airflow_ingress
+    module.eks
   ]
   metadata {
-    name = "${var.helm_release_name}-ingress-nginx-ingress-controller"
+    name = "nginx-ingress-ingress-nginx-ingress-controller"
+    namespace = "default"
   }
 }
 
-data "aws_elb" "airflow_ingress" {
+data "aws_elb" "ingress" {
   count = var.enable_ssl == true ? 1 : 0
   depends_on = [
-    data.kubernetes_service.airflow_ingress
+    data.kubernetes_service.ingress
   ]
-  name = split("-", data.kubernetes_service.airflow_ingress[0].status.0.load_balancer.0.ingress.0.hostname)[0]
+  name = split("-", data.kubernetes_service.ingress[0].status.0.load_balancer.0.ingress.0.hostname)[0]
+}
+
+module "ingress" {
+  source = "./../../"
+  depends_on = [
+    module.eks
+  ]
+  install_ingress = false
+  use_existing_ingress = true
+  existing_ingress_name = "nginx-ingress-ingress-nginx-ingress-controller"
+  existing_ingress_namespace = "default"
+}
+
+output "ingress" {
+  value = module.ingress
 }
