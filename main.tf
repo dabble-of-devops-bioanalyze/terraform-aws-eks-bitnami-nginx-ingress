@@ -1,4 +1,8 @@
 #######################################################
+# terraform-aws-eks-bitnami-nginx-ingress
+#######################################################
+
+#######################################################
 # Ingress
 # Case - install new ingress
 #######################################################
@@ -85,11 +89,33 @@ locals {
 }
 
 output "kubernetes_service" {
-  value = local.kubernetes_service
+  depends_on = [
+    data.kubernetes_service.helm_ingress_existing,
+    data.kubernetes_service.ingress
+  ]
+  # value = local.kubernetes_service
+  value = var.use_existing_ingress == true ? data.kubernetes_service.helm_ingress_existing[0] : data.kubernetes_service.ingress[0]
 }
 
 output "aws_elb" {
-  value = local.aws_elb
+  depends_on = [
+    data.aws_elb.helm_ingress_existing,
+    data.aws_elb.ingress
+  ]
+  # value = local.aws_elb
+  value = var.use_existing_ingress == true ? data.aws_elb.helm_ingress_existing[0] : data.aws_elb.ingress[0]
+}
+
+resource "null_resource" "print" {
+  depends_on = [
+    data.aws_elb.helm_ingress_existing,
+    data.aws_elb.ingress
+  ]
+  provisioner "local-exec" {
+    command = <<EOT
+     echo ${jsonencode(local.aws_elb)}
+     EOT
+  }
 }
 
 #######################################################
