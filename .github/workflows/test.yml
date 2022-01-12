@@ -62,4 +62,4 @@ jobs:
             terraform state rm module.eks.module.eks_cluster.kubernetes_config_map.aws_auth_ignore_changes[0]; \
             terraform refresh; \
             terraform destroy -auto-approve; \
-            terraform output -json
+            terraform state list
