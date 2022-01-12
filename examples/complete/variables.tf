@@ -19,7 +19,7 @@ variable "eks_node_groups" {
       instance_types = ["t3a.medium", "t3a.large"]
       desired_size   = 1
       min_size       = 0
-      max_size       = 10
+      max_size       = 3
       disk_size      = 20
     }
   ]
